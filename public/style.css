@@ -2,17 +2,26 @@
     outline: none !important;
 }
 
-body {
+html, body {
+    height: 100%;
     margin: 0;
-    padding: 2em;
-    font-family: Lucida Sans,Lucida Grande,Arial !important;
-    font-size: 13px !important;
+    overflow: hidden;
+    padding: 0;
     background: white;
-    color: #333;
 }
 
-.chartsNode {
-    border: 1px solid black;
-    width: 600px;
-    padding: 10px;
+#appLayout {
+    height: 100%;
 }
+#topCol {
+    height: 1em;
+}
+#leftCol {
+    width: 14em;
+}
+
+.claro .appLayout .edgePanel {
+    background-color: #d0e9fc;
+}
+
+
