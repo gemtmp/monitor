@@ -1,0 +1,19 @@
+#!/usr/bin/perl
+
+use strict;
+
+use DBI;
+use Encode;
+
+while(<>) {
+	next unless /^Temp: /;
+
+	my $dbh = DBI->connect_cached("dbi:Pg:dbname=monitor", "www", "", {
+		AutoCommit => 1,
+		RaiseError => 0 });
+	my $sth = $dbh->prepare("insert into value (id, time, value) values(?, now(), ?)");
+	while(m/(\w+)=(\-?\d+\.?\d?)/g) {
+		$sth->execute($1, $2);
+	}
+}
+
