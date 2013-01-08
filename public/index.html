@@ -1,0 +1,74 @@
+<!DOCTYPE HTML>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>Temperature</title>
+   		<link rel="stylesheet" href="style.css" media="screen">
+			<link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/dojo/1.8.1/dijit/themes/claro/claro.css" media="screen">
+	</head>
+	<body class="claro">
+		<h1>Температура</h1>
+		<div id="buttonsNode"></div>
+		<div id="plot" data-dojo-type="custom/plot" updateCurrentValue="false"></div>
+		
+		<script>
+			 var dojoConfig = (function(){
+				var base = location.href.split("/");
+				base.pop();
+				base = base.join("/");
+				return {
+					async: true,
+					isDebug: true,
+					parseOnLoad: true,
+					packages: [{
+						name: "custom",
+						location: base + "/custom"
+					}]
+				};
+			})();
+		</script>
+		<!-- load dojo and provide config via data attribute -->
+		<script src="//ajax.googleapis.com/ajax/libs/dojo/1.8.1/dojo/dojo.js"></script>
+		<script>
+			require(["dojo/dom", "dojo/parser", "dijit/registry", "dijit/form/Button", "dojo/store/JsonRest", "custom/plot",
+			         "dojo/ready"],
+			    function(dom, parser, registry, Button, JsonRest, Plot, ready) {
+					ready( function() {
+		        var cont = dom.byId("buttonsNode");
+	        	var store = new JsonRest({
+	        		target: "/sensor",
+	        		idProperty: "id"
+	        	});
+	        	var plot = registry.byId("plot");
+						store.query().forEach( function(res) {
+							var label = res.name + "<p>";
+	            var button = new Button({
+	            		id: "button" + res.id,
+	                title: res.name,
+	                label: label + res.value + res.unit,
+	                curr: res.value,
+	                onClick: function(){
+	                	plot.set("name", res. name);
+	                	plot.set("unitOfMeasure", res.unit);
+	                	plot.set("sensorId", res.id);
+	            			plot.set("currentValue", this.curr);
+	                }
+	            	});
+	            cont.appendChild(button.domNode);
+	            button.startup();
+						});
+	        	setInterval(function() {
+		        	store.query().forEach( function(val) {
+		        		var button = registry.byId("button" + val.id);
+		        		button.curr = val.value;
+		        		button.set('label', val.name + "<p>" + val.value + val.unit);
+		        		if (plot.sensorId == val.id)
+		        			plot.set("currentValue", val.value);
+		        	});
+	        	}, 5000);
+					});
+				}
+			);
+		</script>
+	</body>
+</html>

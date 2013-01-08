@@ -1,0 +1,18 @@
+* {
+    outline: none !important;
+}
+
+body {
+    margin: 0;
+    padding: 2em;
+    font-family: Lucida Sans,Lucida Grande,Arial !important;
+    font-size: 13px !important;
+    background: white;
+    color: #333;
+}
+
+.chartsNode {
+    border: 1px solid black;
+    width: 600px;
+    padding: 10px;
+}

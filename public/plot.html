@@ -1,0 +1,48 @@
+<!DOCTYPE HTML>
+<html lang="ru">
+	<head>
+		<meta charset="utf-8">
+		<title>Demo: StoreSeries - Users Online</title>
+		<link rel="stylesheet" href="style.css" media="screen">
+		<link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/dojo/1.8.1/dijit/themes/claro/claro.css" media="screen">
+	</head>
+	<body class="claro">
+		<h1>Demo: StoreSeries - Users Online</h1>
+		<div id="chartsNode"></div>
+		
+		<!-- Configure Dojo -->
+		<script>
+			 var dojoConfig = (function(){
+				var base = location.href.split("/");
+				base.pop();
+				base = base.join("/");
+				return {
+					async: true,
+					isDebug: true,
+					packages: [{
+						name: "custom",
+						location: base + "/custom"
+					}]
+				};
+			})();
+		</script>
+		<!-- load dojo and provide config via data attribute -->
+		<script src="//ajax.googleapis.com/ajax/libs/dojo/1.8.1/dojo/dojo.js"></script>
+		<script>
+			require(["dojo/dom", "custom/plot","dojo/store/JsonRest", "dojo/domReady!"],
+			    function(dom, plot, JsonRest) {
+		        var cont = dom.byId("chartsNode");
+	        	var store = new JsonRest({
+	        		target: "/sensor",
+	        		idProperty: "time"
+	        	});
+						store.query().forEach( function(res) {
+							var p = new plot({sensorId: res.id, name: res.name, interval: 'minute' });
+							p.placeAt(cont);
+							p.resize();
+						});
+					}
+			);
+		</script>
+	</body>
+</html>
