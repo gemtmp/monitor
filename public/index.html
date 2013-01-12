@@ -61,12 +61,15 @@
 	        		idProperty: "id"
 	        	});
 	        	var plot = registry.byId("plot");
+	        	var getLabel = function(val) {
+	        		return val.name + "<br>" + val.value + val.unit;
+	        	}
 						store.query().forEach( function(res) {
-							var label = res.name + "<p>";
+							var label = res.name + "<br>";
 	            var button = new Button({
 	            		id: "button" + res.id,
 	                title: res.name,
-	                label: label + res.value + res.unit,
+	                label: getLabel(res),
 	                curr: res.value,
 	                onClick: function(){
 	                	plot.set("name", res. name);
@@ -84,7 +87,7 @@
 		        	store.query().forEach( function(val) {
 		        		var button = registry.byId("button" + val.id);
 		        		button.curr = val.value;
-		        		button.set('label', val.name + "<p>" + val.value + val.unit);
+		        		button.set('label', getLabel(val));
 		        		if (plot.sensorId == val.id)
 		        			plot.set("currentValue", val.value);
 		        	});
