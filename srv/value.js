@@ -21,8 +21,10 @@ function send_values(res, next, qstr, params, limit) {
 }
 
 
+// TODO time and value may come different rows
 var sensorQuery = "SELECT id, name, unit"
 	+ ",(select value from value where value.id=sensor.id order by time desc limit 1) as value"
+	+ ",(select time from value where value.id=sensor.id order by time desc limit 1) as time"
 	+ " FROM sensor";
 
 function sensor_list(req, res, next) {

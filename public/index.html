@@ -14,7 +14,7 @@
         <div
                 id="topCol" class="edgePanel"
                 data-dojo-type="dijit/layout/ContentPane"
-                data-dojo-props="region: 'top'">Температура</div>
+                data-dojo-props="region: 'top'">Температура<div id="currTime" style="float:right">Loading...</div></div>
             
         <div id="buttonsNode"
                 class="centerPanel"
@@ -56,6 +56,7 @@
 			    function(dom, registry, Button, JsonRest, Plot, ready) {
 					ready( function() {
 		        var cont = dom.byId("buttonsNode");
+		        var timeNode = dom.byId("currTime");
 	        	var store = new JsonRest({
 	        		target: "/sensor",
 	        		idProperty: "id"
@@ -80,11 +81,13 @@
 	            	});
 	            cont.appendChild(button.domNode);
 	            button.startup();
+	            timeNode.innerHTML = new Date(res.time).toLocaleTimeString();
 						}).then( function() {
 	            registry.byId("appLayout").resize();
 						});
 	        	setInterval(function() {
 		        	store.query().forEach( function(val) {
+		        		timeNode.innerHTML = new Date(val.time).toLocaleTimeString();
 		        		var button = registry.byId("button" + val.id);
 		        		button.curr = val.value;
 		        		button.set('label', getLabel(val));
