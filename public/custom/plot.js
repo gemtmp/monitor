@@ -5,12 +5,12 @@ define(["dojo/_base/declare","dijit/_WidgetBase", "dijit/_TemplatedMixin", "diji
 	"dojo/store/JsonRest", "dojo/store/Observable",
 	"dojox/charting/StoreSeries",
 	"dojo/text!./plot/plot.html",
-	"dojo/on",
+	"dojo/on", "dojo/dom-geometry",
 	"dojox/charting/plot2d/Lines", "dojox/charting/axis2d/Default", "dijit/form/ToggleButton",
 	"dojo/domReady!"],
     function(declare, WidgetBase, TemplatedMixin, WidgetsInTemplateMixin,
     		Chart, Claro, JsonRest, Observable, StoreSeries, template,
-    		On) {
+    		On, DomGeom) {
         return declare("plot", [WidgetBase, TemplatedMixin, WidgetsInTemplateMixin], {
         	sensorId: "",
         	name: "",
@@ -136,11 +136,17 @@ define(["dojo/_base/declare","dijit/_WidgetBase", "dijit/_TemplatedMixin", "diji
 				});
 	        },
 	        startup: function() {
+	        	this.inherited(arguments);
 	        	this.resize();
 	        },
-        	resize: function(w,h) {
-	        	if (this.chart)
-	        		this.chart.resize(w,h);
+        	resize: function(w) {
+	        	if (!this.chart)
+	        		return;
+	        	
+	        	var chartBox = DomGeom.getMarginBox(this.chartNode);
+	        	var buttinsBox = DomGeom.getMarginBox(this.buttonsNode);
+	        	var h = w ? w.h - buttinsBox.h : chartBox.h;
+	        	this.chart.resize({w : buttinsBox.w, h: h});
         	},
         	uninitialize: function() {
         		this.inherited(arguments);
