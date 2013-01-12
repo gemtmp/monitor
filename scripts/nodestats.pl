@@ -9,11 +9,9 @@ use Encode;
 use Filesys::Df;
 use Net::Ping;
 
-sub saveValues($) {
-	my ($arr) = @_;
-	my $dbh = DBI->connect_cached("dbi:Pg:dbname=monitor", "www", "", {
-		AutoCommit => 1,
-		RaiseError => 0 });
+sub saveValues($$) {
+	my ($dbh, $arr) = @_;
+
 	my $sth = $dbh->prepare("insert into value (id, time, value) values(?, now(), ?)");
 	foreach my $id (keys %{$arr}) {
 		#print ("$id ".$arr->{$id}."\n");
@@ -23,12 +21,21 @@ sub saveValues($) {
 
 while() {
 	sleep(60);
+	my $dbh = DBI->connect_cached("dbi:Pg:dbname=monitor", "www", "", {
+		AutoCommit => 1,
+		RaiseError => 0 });
+
 	my %h;
 	my $t = `sysctl -n 'hw.acpi.thermal.tz0.temperature'`;
 	$t =~ s/C//;
 	$t =~ s/,/./;
+	chomp($t);
 	$h{'router CPU temp'} = $t;
 
+	my $all = $dbh->selectall_arrayref("select id from value id where id like 'online %' group by id");
+	foreach my $i (@{$all}) {
+		$h{@$i[0]} = 0;
+	}
 	my $arp = `arp -an`;
 	while($arp =~ m/(\w\w\:\w\w\:\w\w\:\w\w\:\w\w\:\w\w).+?expires/g) {
 		my $id = $1;
@@ -41,6 +48,6 @@ while() {
 	$h{"internet online"} = $p->ping('google.com') ? 1:0;
   $p->close();
 
-	saveValues(\%h);
+	saveValues($dbh, \%h);
 }
 
