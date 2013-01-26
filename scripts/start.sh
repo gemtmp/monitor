@@ -14,6 +14,6 @@ done &
 
 cd srv
 while( true) ; do
-	node value.js 2>&1 > /dev/null < /dev/null
+	node value.js > /dev/null 2>&1 < /dev/null
 	sleep 5
 done &
