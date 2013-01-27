@@ -12,8 +12,11 @@ function send_values(res, next, qstr, params, limit) {
 		qstr += " limit " + limit;
 	var query = client.query(qstr, params,
 	  function (err, result) {
-		if (err)
+		if (err) {
+			console.log("Error in " + qstr + " params " + params + ": " + err );
 			return res.send(err);
+		}
+			
 		if (result.rows.length > 0)
 			return res.send(result.rows);
 		return next(new restify.ResourceNotFoundError());
@@ -45,10 +48,15 @@ function sensor_values_avg(req, res, next) {
 		return next(new restify.InvalidArgumentError(
 			"invalid interval, allowed 'minute', 'hour' and 'day'"));
 	}
+	var limit = req.params.last == undefined ? 100 : 1;
 	var qstr = "select id, round(cast(avg(value) as numeric),1) as value, date_trunc($1, t) as time "
-		+ " from value as v (id, t, value) where id = $2 group by id, time order by time desc";
+		+ " from value as v (id, t, value)"
+		+ " where id = $2 and t > now() - interval '" + limit + " " + req.params.interval + "'"
+		+ " group by id, time order by time desc";
 		
-	send_values(res, next, qstr, [req.params.interval, req.params.id], req.params.last == undefined ? 100 : 1);	
+	send_values(res, next, qstr,
+		[req.params.interval, req.params.id],
+		limit);
 }
 
 function sensor_values(req, res, next) {
