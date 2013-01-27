@@ -85,9 +85,14 @@
 						}).then( function() {
 	            registry.byId("appLayout").resize();
 						});
+	            var lastTime = new Date();
 	        	setInterval(function() {
 		        	store.query().forEach( function(val) {
-		        		timeNode.innerHTML = new Date(val.time).toLocaleTimeString();
+		        		var curDate = new Date(val.time);
+		        		if (lastTime.getTime() < curDate.getTime()) {
+		        			lastTime = curDate;
+		        			timeNode.innerHTML = curDate.toLocaleTimeString();
+		        		}
 		        		var button = registry.byId("button" + val.id);
 		        		button.curr = val.value;
 		        		button.set('label', getLabel(val));
