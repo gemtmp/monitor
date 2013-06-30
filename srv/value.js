@@ -24,10 +24,11 @@ function send_values(res, next, qstr, params, limit) {
 }
 
 
+var valquery = " from value where value.id=sensor.id and time > now() - interval '1 day' order by time desc limit 1";
 // TODO time and value may come different rows
 var sensorQuery = "SELECT id, name, unit"
-	+ ",(select value from value where value.id=sensor.id order by time desc limit 1) as value"
-	+ ",(select time from value where value.id=sensor.id order by time desc limit 1) as time"
+	+ ",(select value"+ valquery +") as value"
+	+ ",(select time"+ valquery +") as time"
 	+ " FROM sensor";
 
 function sensor_list(req, res, next) {
@@ -35,7 +36,7 @@ function sensor_list(req, res, next) {
 }
 
 function sensor(req, res, next) {
-	return send_values(res, next, sensorQuery + " WHERE sensor.id = $1", [req.params.id]);
+	return send_values(res, next, sensorQuery + " WHERE sensor.id = $1", [req.params.id], 100);
 }
 
 function sensor_values_avg(req, res, next) {
@@ -83,5 +84,8 @@ server.get(/\/.*\.css/, restify.serveStatic({directory: '../public/'}));
 server.get(/\/.*\.js/, restify.serveStatic({directory: '../public/'}));
 
 server.listen(8080, "::", function() {
+  console.log('%s listening at %s', server.name, server.url);
+});
+server.listen(8080, function() {
   console.log('%s listening at %s', server.name, server.url);
 });
