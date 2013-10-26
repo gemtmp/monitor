@@ -26,13 +26,13 @@ while() {
 		RaiseError => 0 });
 
 	my %h;
-	my $t = `sysctl -n 'hw.acpi.thermal.tz0.temperature'`;
-	$t =~ s/C//;
-	$t =~ s/,/./;
-	chomp($t);
-	$h{'router CPU temp'} = $t;
+#	my $t = `sysctl -n 'hw.acpi.thermal.tz0.temperature'`;
+#	$t =~ s/C//;
+#	$t =~ s/,/./;
+#	chomp($t);
+#	$h{'router CPU temp'} = $t;
 
-	my $all = $dbh->selectall_arrayref("select id from value id where id like 'online %' group by id");
+	my $all = $dbh->selectall_arrayref("select id from sensor where id like 'online %' group by id");
 	foreach my $i (@{$all}) {
 		$h{@$i[0]} = 0;
 	}
@@ -46,7 +46,7 @@ while() {
 
 	my $p = Net::Ping->new('icmp', 1);
 	$h{"internet online"} = $p->ping('google.com') ? 1:0;
-  $p->close();
+	$p->close();
 
 	saveValues($dbh, \%h);
 }
