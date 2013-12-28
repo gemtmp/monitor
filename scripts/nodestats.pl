@@ -48,6 +48,11 @@ while() {
 	$h{"internet online"} = $p->ping('google.com') ? 1:0;
 	$p->close();
 
+	$h{"AC"} = `/usr/local/bin/upsc provision\@localhost input.voltage` + 0;
+	$h{"DC"} = `/usr/local/bin/upsc provision\@localhost battery.voltage` + 0;
+	$h{"UPS"} = `/usr/local/bin/upsc provision\@localhost ups.temperature` + 0;
+	$h{"UPS load"} = `/usr/local/bin/upsc provision\@localhost ups.load` + 0;
+
 	saveValues($dbh, \%h);
 }
 
