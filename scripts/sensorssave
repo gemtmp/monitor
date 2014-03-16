@@ -6,6 +6,7 @@ use DBI;
 use Encode;
 
 while(<>) {
+	print $_;
 	next unless /^Temp: /;
 
 	my $dbh = DBI->connect_cached("dbi:Pg:dbname=monitor", "www", "", {
