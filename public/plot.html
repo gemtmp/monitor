@@ -33,7 +33,7 @@
 			    function(dom, plot, JsonRest) {
 		        var cont = dom.byId("chartsNode");
 	        	var store = new JsonRest({
-	        		target: "/sensor",
+	        		target: "sensor",
 	        		idProperty: "time"
 	        	});
 						store.query().forEach( function(res) {

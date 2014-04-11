@@ -3,8 +3,8 @@
 	<head>
 		<meta charset="utf-8">
 		<title>Temperature</title>
-   		<link rel="stylesheet" href="style.css" media="screen">
-			<link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/dojo/1.8.1/dijit/themes/claro/claro.css" media="screen">
+		<link rel="stylesheet" href="style.css" media="screen">
+		<link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/dojo/1.8.1/dijit/themes/claro/claro.css" media="screen">
 	</head>
 	<body class="claro">
 	    <div
@@ -58,7 +58,7 @@
 		        var cont = dom.byId("buttonsNode");
 		        var timeNode = dom.byId("currTime");
 	        	var store = new JsonRest({
-	        		target: "/sensor",
+	        		target: "sensor",
 	        		idProperty: "id"
 	        	});
 	        	var plot = registry.byId("plot");

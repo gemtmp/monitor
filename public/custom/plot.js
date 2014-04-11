@@ -87,7 +87,7 @@ define(["dojo/_base/declare","dijit/_WidgetBase", "dijit/_TemplatedMixin", "diji
 	        },
 	        createStore: function() {
 	        	this.store = Observable(new JsonRest({
-	        		target: "/sensor/" + this.sensorId + "/value/" + this.interval,
+	        		target: "sensor/" + this.sensorId + "/value/" + this.interval,
 	        		idProperty: "time"
 	        	}));
 	        },
@@ -129,7 +129,7 @@ define(["dojo/_base/declare","dijit/_WidgetBase", "dijit/_TemplatedMixin", "diji
 	        		return;
 	        	if (!this.updateCurrentValue)
 	        		return;
-	        	var curStore = new JsonRest({target: "/sensor/" + this.sensorId + "/value"});
+	        	var curStore = new JsonRest({target: "sensor/" + this.sensorId + "/value"});
 	        	var ths = this;
     			curStore.query("?last").forEach(function (res) {
     				ths.set("currentValue", res.value);
