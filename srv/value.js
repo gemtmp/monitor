@@ -1,6 +1,6 @@
 var pg = require('pg'); 
 
-var conString = "tcp://www:1q2w3eQAWSED@router/monitor";
+var conString = "tcp://www@localhost/monitor";
 
 var client = new pg.Client(conString);
 client.connect();
@@ -70,22 +70,14 @@ server.use(restify.acceptParser(server.acceptable));
 server.use(restify.queryParser());
 server.use(restify.jsonp());
 
-server.get('/sensor', sensor_list);
-server.get('/sensor/:id', sensor);
-server.get('/sensor/:id/value', sensor_values);
-server.get('/sensor/:id/value/:interval', sensor_values_avg);
+var prefix = 'temperature';
+server.get(prefix+'/sensor', sensor_list);
+server.get(prefix+'/sensor/:id', sensor);
+server.get(prefix+'/sensor/:id/value', sensor_values);
+server.get(prefix+'/sensor/:id/value/:interval', sensor_values_avg);
 
-server.get(/^\/$/, function(req, res, next){
-	res.writeHead(302, {'Location': '/index.html'});
-	res.end();
-});
-server.get(/\/.*\.html/, restify.serveStatic({directory: '../public/'}));
-server.get(/\/.*\.css/, restify.serveStatic({directory: '../public/'}));
-server.get(/\/.*\.js/, restify.serveStatic({directory: '../public/'}));
+server.get(new RegExp('/'+prefix+'/?.*'), restify.serveStatic({'directory': '../public', 'default': 'index.html'}));
 
-server.listen(8080, "::", function() {
-  console.log('%s listening at %s', server.name, server.url);
-});
 server.listen(8080, function() {
   console.log('%s listening at %s', server.name, server.url);
 });
