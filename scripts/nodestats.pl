@@ -56,7 +56,7 @@ while() {
 
 	my $vent = `nc -w 1 vent.gem 80`;
 	while($vent =~ m/(.+?)=(\S+)\n/g) {
-		$h{$1} = $2 + 0;
+		$h{$1} = int(($2 + 0) *100)/100;
 	}
 	saveValues($dbh, \%h);
 	sleep(60);
