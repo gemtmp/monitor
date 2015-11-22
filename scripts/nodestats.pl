@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/local/bin/perl
 
 # fetch some node stats, freebsd version
 
@@ -20,7 +20,6 @@ sub saveValues($$) {
 }
 
 while() {
-	sleep(60);
 	my $dbh = DBI->connect_cached("dbi:Pg:dbname=monitor", "www", "", {
 		AutoCommit => 1,
 		RaiseError => 0 });
@@ -55,6 +54,11 @@ while() {
 	$h{"UPS"} = `/usr/local/bin/upsc provision\@localhost ups.temperature` + 0;
 	$h{"UPS load"} = `/usr/local/bin/upsc provision\@localhost ups.load` + 0;
 
+	my $vent = `nc -w 1 vent.gem 80`;
+	while($vent =~ m/(.+?)=(\S+)\n/g) {
+		$h{$1} = $2 + 0;
+	}
 	saveValues($dbh, \%h);
+	sleep(60);
 }
 
