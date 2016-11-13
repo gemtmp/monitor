@@ -23,13 +23,21 @@ function send_values(res, next, qstr, params, limit) {
 	});
 }
 
+function group_list(req, res, next) {
+	return send_values(res, next, "select id, name from sensor_group");
+}
+
+function group(req, res, next) {
+	return send_values(res, next, "select id, name from sensor_group where id=$1", [req.params.id]);
+}
+
 
 var valquery = " from value where value.id=sensor.id and time > now() - interval '1 day' order by time desc limit 1";
 // TODO time and value may come different rows
-var sensorQuery = "SELECT id, name, unit"
+var sensorQuery = "SELECT id, name, unit, group_id"
 	+ ",(select value"+ valquery +") as value"
 	+ ",(select time"+ valquery +") as time"
-	+ " FROM sensor";
+	+ " FROM sensor order by group_id, name";
 
 function sensor_list(req, res, next) {
 	return send_values(res, next, sensorQuery);
@@ -71,6 +79,8 @@ server.use(restify.queryParser());
 server.use(restify.jsonp());
 
 var prefix = 'temperature';
+server.get(prefix+'/group', group_list);
+server.get(prefix+'/group/:id', group);
 server.get(prefix+'/sensor', sensor_list);
 server.get(prefix+'/sensor/:id', sensor);
 server.get(prefix+'/sensor/:id/value', sensor_values);
