@@ -58,6 +58,10 @@ while() {
 	while($vent =~ m/(.+?)=(\S+)\n/g) {
 		$h{$1} = int(($2 + 0.005) *100)/100;
 	}
+	my $co2 = `nc -w 1 co2.gem 80`;
+	while($co2 =~ m/(.+?)=(\S+)\n/g) {
+		$h{$1} = int(($2 + 0.005) *100)/100;
+	}
 	saveValues($dbh, \%h);
 	sleep(60);
 }
