@@ -57,12 +57,19 @@ function sensor_values_avg(req, res, next) {
 		return next(new restify.InvalidArgumentError(
 			"invalid interval, allowed 'minute', 'hour' and 'day'"));
 	}
+	var start = 'now()';
+	if (req.params.start != undefined) {
+		// TODO sql escape and validate
+		start = "timestamp '" + req.params.start + "'";
+	}
 	var limit = req.params.last == undefined ? 100 : 1;
 	var qstr = "select id, round(cast(avg(value) as numeric),1) as value, date_trunc($1, t) as time "
 		+ " from value as v (id, t, value)"
-		+ " where id = $2 and t > now() - interval '" + limit + " " + req.params.interval + "'"
+		+ " where id = $2 and t < " + start + " and t > " + start + " - interval '" + limit + " " + req.params.interval + "'" 
 		+ " group by id, time order by time desc";
 		
+	console.log('sensor_values: start: %s ', start);
+
 	send_values(res, next, qstr,
 		[req.params.interval, req.params.id],
 		limit);

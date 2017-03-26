@@ -7,6 +7,7 @@ define(["dojo/_base/declare","dijit/_WidgetBase", "dijit/_TemplatedMixin", "diji
 	"dojo/text!./plot/plot.html",
 	"dojo/on", "dojo/dom-geometry",
 	"dojox/charting/plot2d/Lines", "dojox/charting/axis2d/Default", "dijit/form/ToggleButton",
+	"dijit/form/TextBox",
 	"dojo/domReady!"],
     function(declare, WidgetBase, TemplatedMixin, WidgetsInTemplateMixin,
     		Chart, Claro, JsonRest, Observable, StoreSeries, template,
@@ -17,6 +18,7 @@ define(["dojo/_base/declare","dijit/_WidgetBase", "dijit/_TemplatedMixin", "diji
         	currentValue : "?",
         	unitOfMeasure: "",
         	interval: "/minute",
+		startFrom: "",
         	updateCurrentValue: true,
         	templateString: template,
         	baseClass: "plot",
@@ -28,6 +30,7 @@ define(["dojo/_base/declare","dijit/_WidgetBase", "dijit/_TemplatedMixin", "diji
         	postCreate: function(){
         		this.inherited(arguments);
         		
+			this.startFrom =  "";
 	        	this.updateButtons();
 	        	this.draw();
 	        	this.setTimers();
@@ -43,6 +46,7 @@ define(["dojo/_base/declare","dijit/_WidgetBase", "dijit/_TemplatedMixin", "diji
 				On(this.minuteButton, "click", function() {ths.set('interval', '/minute');});
 				On(this.hourButton, "click", function() {ths.set("interval", '/hour');});
 				On(this.dayButton, "click", function() {ths.set("interval", '/day');});
+				On(this.dateButton, "click", function() {ths.set("startFrom", ths.startDate.get('value'));});
 
 	        	this.chartInterval = setInterval(function() {
 	        			if (ths.store)
@@ -75,6 +79,14 @@ define(["dojo/_base/declare","dijit/_WidgetBase", "dijit/_TemplatedMixin", "diji
 	        	this.createStore();
 	        	this.updateChart();
 	        },
+	        _setStartFromAttr: function (value) {
+	        	if (this.startFrom == value)
+	        		return;
+	        	this._set("startFrom", value);
+	        	this.updateButtons();
+	        	this.createStore();
+	        	this.updateChart();
+	        },
 	        _setNameAttr: function(value) {
 	        	this._set("name", value);
 				this.nameNode.innerHTML = value;
@@ -89,7 +101,8 @@ define(["dojo/_base/declare","dijit/_WidgetBase", "dijit/_TemplatedMixin", "diji
 	        },
 	        createStore: function() {
 	        	this.store = Observable(new JsonRest({
-	        		target: "sensor/" + this.sensorId + "/value" + this.interval,
+	        		target: "sensor/" + this.sensorId + "/value" + this.interval
+					+ ((this.startFrom && this.startFrom != '') ?  ('?start=' + encodeURIComponent(this.startFrom)) : ''),
 	        		idProperty: "time"
 	        	}));
 	        },
@@ -124,7 +137,7 @@ define(["dojo/_base/declare","dijit/_WidgetBase", "dijit/_TemplatedMixin", "diji
 	        		type: "Lines",
 	        		markers: false, hAxis: "x", vAxis: "y"
 	        	});
-	        	this.chart.addAxis("y", {fixUpper: "major", fixLower: "major", minorLabels: false, vertical: true, fixed: true, includeZero: true});
+	        	this.chart.addAxis("y", {fixUpper: "major", fixLower: "major", minorLabels: false, vertical: true, fixed: true, includeZero: false});
 	        },
 	        initCurrValue: function () {
 	        	if (!this.sensorId)
