@@ -34,10 +34,10 @@ function group(req, res, next) {
 
 var valquery = " from value where value.id=sensor.id and time > now() - interval '1 day' order by time desc limit 1";
 // TODO time and value may come different rows
-var sensorQuery = "SELECT id, name, unit, group_id"
-	+ ",(select value"+ valquery +") as value"
-	+ ",(select time"+ valquery +") as time"
-	+ " FROM sensor order by group_id, name";
+var sensorQuery = "select sensor.id, name, unit, group_id, value.value, value.time  from sensor "
+	+ "join (select id, max(time) t from value where time > now() - '1 day'::interval group by id) as maxvalue on sensor.id=maxvalue.id "
+	+ "join value on sensor.id=value.id and value.time=maxvalue.t "
+	+ "order by group_id, name";
 
 function sensor_list(req, res, next) {
 	return send_values(res, next, sensorQuery);
