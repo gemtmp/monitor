@@ -96,7 +96,7 @@ function(dom, registry, Button, JsonRest, domStyle, Plot, ready) {
 				buttons.push(button);
 				cont.appendChild(button.domNode);
 				button.startup();
-				timeNode.innerHTML = new Date(res.time).toLocaleTimeString();
+				timeNode.innerHTML = new Date(res.time).toLocaleTimeString("ru");
 			});
 		}).then( function() {
 			registry.byId("appLayout").resize();
@@ -107,7 +107,7 @@ function(dom, registry, Button, JsonRest, domStyle, Plot, ready) {
 				var curDate = new Date(val.time);
 				if (lastTime.getTime() < curDate.getTime()) {
 					lastTime = curDate;
-					timeNode.innerHTML = curDate.toLocaleTimeString();
+					timeNode.innerHTML = curDate.toLocaleTimeString("ru");
 				}
 				var button = registry.byId("button" + val.id);
 				button.curr = val.value;
