@@ -37,7 +37,7 @@
 	        		idProperty: "time"
 	        	});
 						store.query().forEach( function(res) {
-							var p = new plot({sensorId: res.id, name: res.name, interval: 'minute' });
+							var p = new plot({sensorId: res.id, name: res.name, interval: 60 });
 							p.placeAt(cont);
 							p.resize();
 						});

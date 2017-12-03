@@ -17,12 +17,11 @@ define(["dojo/_base/declare","dijit/_WidgetBase", "dijit/_TemplatedMixin", "diji
         	name: "",
         	currentValue : "?",
         	unitOfMeasure: "",
-        	interval: "/minute",
+        	interval: 60,
 		startFrom: "",
         	updateCurrentValue: true,
         	templateString: template,
         	baseClass: "plot",
-        	steps: {'' : 5, '/minute': 120, '/hour': 3600, '/day': 3600*12 },
         	chart: null,
         	store: null,
         	chartInterval: null,
@@ -42,10 +41,10 @@ define(["dojo/_base/declare","dijit/_WidgetBase", "dijit/_TemplatedMixin", "diji
         	},
         	setTimers: function() {
 	        	var ths = this;
-				On(this.nowButton, "click", function() {ths.set('interval', '');});
-				On(this.minuteButton, "click", function() {ths.set('interval', '/minute');});
-				On(this.hourButton, "click", function() {ths.set("interval", '/hour');});
-				On(this.dayButton, "click", function() {ths.set("interval", '/day');});
+				On(this.nowButton, "click", function() {ths.set('interval', 5);});
+				On(this.minuteButton, "click", function() {ths.set('interval', 60);});
+				On(this.hourButton, "click", function() {ths.set("interval", 600);});
+				On(this.dayButton, "click", function() {ths.set("interval", 1200);});
 				On(this.dateButton, "click", function() {ths.set("startFrom", ths.startDate.get('value'));});
 
 	        	this.chartInterval = setInterval(function() {
@@ -58,10 +57,10 @@ define(["dojo/_base/declare","dijit/_WidgetBase", "dijit/_TemplatedMixin", "diji
 	        		this.currInterval = setInterval(function(){ths.initCurrValue()}, 5000);
 	        },
 	        updateButtons: function() {
-        		this.nowButton.set('checked', this.interval == '');
-        		this.minuteButton.set('checked', this.interval == '/minute');
-        		this.hourButton.set('checked', this.interval == '/hour');
-        		this.dayButton.set('checked', this.interval == '/day');
+        		this.nowButton.set('checked', this.interval == 5);
+        		this.minuteButton.set('checked', this.interval == 60);
+        		this.hourButton.set('checked', this.interval == 600);
+        		this.dayButton.set('checked', this.interval == 6000);
 	        },
 	        _setSensorIdAttr: function(id) {
 	        	if (this.sensorId == id)
@@ -101,15 +100,15 @@ define(["dojo/_base/declare","dijit/_WidgetBase", "dijit/_TemplatedMixin", "diji
 	        },
 	        createStore: function() {
 	        	this.store = Observable(new JsonRest({
-	        		target: "sensor/" + this.sensorId + "/value" + this.interval
+	        		target: "sensor/" + this.sensorId + "/value/" + this.interval
 					+ ((this.startFrom && this.startFrom != '') ?  ('?start=' + encodeURIComponent(this.startFrom)) : ''),
 	        		idProperty: "time"
 	        	}));
 	        },
 	        updateChart: function() {
 	        	this.chart.removeAxis("x");
-	        	var step = this.steps[this.interval] * 1000;
-	        	var addDay = this.interval != '/minute' && this.interval != '';
+	        	var step = this.interval * 1000;
+	        	var addDay = this.interval > 60;
 	        	this.chart.addAxis("x", { fixUpper: "major", majorTickStep: step*10, minorTickStep: step,
 	        		labelFunc: function(text, value, precision) {
 	        			var date = new Date(value);

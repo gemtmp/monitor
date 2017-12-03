@@ -48,25 +48,30 @@ function sensor(req, res, next) {
 }
 
 function sensor_values_avg(req, res, next) {
-	switch (req.params.interval) {
-	case 'minute':
-	case 'hour':
-	case 'day':
-		break;
-	default:
-		return next(new restify.InvalidArgumentError(
-			"invalid interval, allowed 'minute', 'hour' and 'day'"));
-	}
+//	switch (req.params.interval) {
+//	case 'minute':
+//	case 'hour':
+//	case 'day':
+//		break;
+//	default:
+//		return next(new restify.InvalidArgumentError(
+//			"invalid interval, allowed 'minute', 'hour' and 'day'"));
+//	}
 	var start = 'now()';
 	if (req.params.start != undefined) {
 		// TODO sql escape and validate
 		start = "timestamp '" + req.params.start + "'";
 	}
 	var limit = req.params.last == undefined ? 100 : 1;
-	var qstr = "select id, round(cast(avg(value) as numeric),1) as value, date_trunc($1, t) as time "
-		+ " from value as v (id, t, value)"
-		+ " where id = $2 and t < " + start + " and t > " + start + " - interval '" + limit + " " + req.params.interval + "'" 
-		+ " group by id, time order by time desc";
+	var qstr = "select id, round(cast(avg(value) as numeric),1) as value, min(t) as time,"
+		+ " round(cast(EXTRACT(EPOCH FROM t) as numeric) / $1, 0) as time1"
+		+ " from value as v (id, t, value) where id = $2"
+		+ " and t < " + start + " and t > " + start + " - interval '"+req.params.interval * limit + " seconds'"
+		+ " group by id, time1 order by time desc";
+//	var qstr = "select id, round(cast(avg(value) as numeric),1) as value, date_trunc($1, t) as time "
+//		+ " from value as v (id, t, value)"
+//		+ " where id = $2 and t < " + start + " and t > " + start + " - interval '" + limit + " " + req.params.interval + "'" 
+//		+ " group by id, time order by time desc";
 		
 	console.log('sensor_values: start: %s ', start);
 
