@@ -8,6 +8,7 @@ client.connect();
 var restify = require('restify');
 
 function send_values(res, next, qstr, params, limit) {
+
 	if (limit)
 		qstr += " limit " + limit;
 	var query = client.query(qstr, params,
@@ -36,15 +37,14 @@ var valquery = " from value where value.id=sensor.id and time > now() - interval
 // TODO time and value may come different rows
 var sensorQuery = "select sensor.id, name, unit, group_id, value.value, value.time  from sensor "
 	+ "join (select id, max(time) t from value where time > now() - '1 day'::interval group by id) as maxvalue on sensor.id=maxvalue.id "
-	+ "join value on sensor.id=value.id and value.time=maxvalue.t "
-	+ "order by group_id, name";
+	+ "join value on sensor.id=value.id and value.time=maxvalue.t ";
 
 function sensor_list(req, res, next) {
-	return send_values(res, next, sensorQuery);
+	return send_values(res, next, sensorQuery + " order by group_id, name");
 }
 
 function sensor(req, res, next) {
-	return send_values(res, next, sensorQuery + " WHERE sensor.id = $1", [req.params.id], 100);
+	return send_values(res, next, sensorQuery + " WHERE sensor.id = $1 order by group_id, name", [req.params.id], 100);
 }
 
 function sensor_values_avg(req, res, next) {
